@@ -453,7 +453,23 @@
 
             if ($img.length) {
                 var permalink = $previewImage.data('permalink') || '#';
-                $previewImage.append($('<a>').attr('href', permalink).append($img.clone().attr('fetchpriority', 'high')));
+                var $clonedImg = $img.clone().attr('fetchpriority', 'high');
+                var srcset = $clonedImg.attr('srcset');
+                var src640 = null;
+                if (srcset) {
+                    var entries = srcset.split(',');
+                    for (var i = 0; i < entries.length; i++) {
+                        var parts = entries[i].trim().split(/\s+/);
+                        if (parts.length === 2 && parts[1] === '640w') {
+                            src640 = parts[0];
+                            break;
+                        }
+                    }
+                }
+                if (src640) {
+                    $clonedImg.attr('src', src640).removeAttr('srcset').removeAttr('sizes');
+                }
+                $previewImage.append($('<a>').attr('href', permalink).append($clonedImg));
                 $previewImage.show();
             } else {
                 $previewTitle.show();
