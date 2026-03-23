@@ -68,7 +68,7 @@
         .single img {
             height:auto;
         }
-        .text-body-hidden { display: none; }
+        .text-body-hidden { visibility: hidden; height: 0; overflow: hidden; position: absolute; }
         .text-preview-image { display: none; }
         .text-preview-title { display: none; }
         .text-preview-image img { width: 100%; height: auto; }
@@ -181,13 +181,13 @@
 
             {block:IndexPage}
                 <div class="post-background {TagsAsClasses}">
-                    <a href="{Permalink}"><img src="{PhotoURL-HighRes}" alt="{PhotoAlt}"/></a>
+                    <a href="{Permalink}"><img src="{PhotoURL-HighRes}" alt="{PhotoAlt}" fetchpriority="high"/></a>
                 </div>
             {/block:IndexPage}
 
             {block:PermalinkPage}
                 <div class="post-background">
-                    <img src="{PhotoURL-HighRes}" alt="{PhotoAlt}"/>
+                    <img src="{PhotoURL-HighRes}" alt="{PhotoAlt}" fetchpriority="high"/>
                 </div>
                 {block:Caption}
                     <div class="caption">{Caption}</div>
@@ -207,13 +207,13 @@
 
                 {Block:IndexPage}
                     <div class="photoset post-background {TagsAsClasses}">
-                        <a href="{Permalink}"><img src="{PhotoURL-500}" width="{PhotoWidth-500}"height="{PhotoHeight-500}" />{block:Caption}{Caption}{/block:Caption}</a>
+                        <a href="{Permalink}"><img src="{PhotoURL-500}" width="{PhotoWidth-500}"height="{PhotoHeight-500}" fetchpriority="high"/>{block:Caption}{Caption}{/block:Caption}</a>
                     </div>
                 {/Block:IndexPage}
 
                 {Block:PermalinkPage}
                     <div class="photoset post-background">
-                        <img src="{PhotoURL-HighRes}" width="{PhotoWidth-HighRes}"height="{PhotoHeight-HighRes}" />
+                        <img src="{PhotoURL-HighRes}" width="{PhotoWidth-HighRes}"height="{PhotoHeight-HighRes}" fetchpriority="high"/>
                     </div>
                 {/Block:PermalinkPage}
 
@@ -453,7 +453,7 @@
 
             if ($img.length) {
                 var permalink = $previewImage.data('permalink') || '#';
-                $previewImage.append($('<a>').attr('href', permalink).append($img.clone()));
+                $previewImage.append($('<a>').attr('href', permalink).append($img.clone().attr('fetchpriority', 'high')));
                 $previewImage.show();
             } else {
                 $previewTitle.show();
