@@ -85,23 +85,31 @@
 (function blockUnifiedControls() {
     var iframes = document.querySelectorAll('iframe[name="unified-controls"]');
     for (var i = 0; i < iframes.length; i++) {
-        iframes[i].parentNode.removeChild(iframes[i]);
+        if (iframes[i].parentNode) {
+            iframes[i].parentNode.removeChild(iframes[i]);
+        }
     }
     if (typeof MutationObserver !== 'undefined') {
         var observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                mutation.addedNodes.forEach(function(node) {
-                    if (node.nodeName === 'IFRAME' && node.getAttribute('name') === 'unified-controls') {
-                        node.parentNode.removeChild(node);
+            for (var m = 0; m < mutations.length; m++) {
+                var addedNodes = mutations[m].addedNodes;
+                for (var n = 0; n < addedNodes.length; n++) {
+                    var node = addedNodes[n];
+                    if (node.nodeName.toUpperCase() === 'IFRAME' && node.getAttribute('name') === 'unified-controls') {
+                        if (node.parentNode) {
+                            node.parentNode.removeChild(node);
+                        }
                     }
                     if (node.querySelectorAll) {
                         var nested = node.querySelectorAll('iframe[name="unified-controls"]');
                         for (var j = 0; j < nested.length; j++) {
-                            nested[j].parentNode.removeChild(nested[j]);
+                            if (nested[j].parentNode) {
+                                nested[j].parentNode.removeChild(nested[j]);
+                            }
                         }
                     }
-                });
-            });
+                }
+            }
         });
         observer.observe(document.documentElement, { childList: true, subtree: true });
     }
