@@ -45,15 +45,14 @@
 {/block:Posts}	
 {/block:PermalinkPage}
 	    
-<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" integrity="sha512-3n19xznO0ubPpSwYCRRBgHh63DrV+bdZfHK52b1esvId4GsfwStQNPJFjeQos2h3JwCmZl0/LgLxSKMAI55hgw==" crossorigin="anonymous"></script>
+
         <!--[if IE]>
             <script src="https://static.tumblr.com/j9zrgpw/Sa4n3cja6/html5.js"></script>
         <![endif]-->
 
         <!-- Stylesheet -->
-        <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css"/>
+        <!-- link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css"/ -->
         <link rel="stylesheet" type="text/css" href="https://static.tumblr.com/j9zrgpw/MFon38qg7/style.css"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/fontawesome.min.css" integrity="sha512-8jdwayz5n8F2cnW26l9vpV6+yGOcRAqz6HTu+DQ3FtVIAts2gTdlFZOGpYhvBMXkWEgxPN3Y22UWyZXuDowNLA==" crossorigin="anonymous" />
 
         <!-- Defaults -->
         <meta name="color:Post Hover" content="#fbfbfb"/>
@@ -69,6 +68,11 @@
         .single img {
             height:auto;
         }
+        .text-body-hidden { visibility: hidden; height: 0; overflow: hidden; position: absolute; }
+        .text-preview-image { display: none; }
+        .text-preview-title { display: none; }
+        .text-preview-image img { width: 100%; height: auto; }
+        .iframe-controls-container { display: none; }
         {CustomCSS}
         </style>
 
@@ -143,17 +147,27 @@
         <!-- Text Post -->
             <div class="text {TagsAsClasses}">
 
-                {Block:PermalinkPage}
+                {block:IndexPage}
+                    <div class="text-body-hidden">{Body}</div>
+                    <div class="text-preview-image post-background" data-permalink="{Permalink}"></div>
+                    <div class="text-preview-title">
+                        {block:Title}
+                            <h2><a href="{Permalink}">{Title}</a></h2>
+                        {/block:Title}
+                    </div>
+                {/block:IndexPage}
+
+                {block:PermalinkPage}
                     <hr>
-                {/Block:PermalinkPage}
 
-                {block:Title}
-                    <h2><a href="{Permalink}">{Title}</a></h2>
-                {/block:Title}
+                    {block:Title}
+                        <h2><a href="{Permalink}">{Title}</a></h2>
+                    {/block:Title}
 
-                <div class="text-body">
-                    {Body}
-                </div>
+                    <div class="text-body">
+                        {Body}
+                    </div>
+                {/block:PermalinkPage}
 
             </div>
         {/block:Text}
@@ -167,13 +181,13 @@
 
             {block:IndexPage}
                 <div class="post-background {TagsAsClasses}">
-                    <a href="{Permalink}"><img src="{PhotoURL-HighRes}" alt="{PhotoAlt}"/></a>
+                    <a href="{Permalink}"><img src="{PhotoURL-HighRes}" alt="{PhotoAlt}" fetchpriority="high"/></a>
                 </div>
             {/block:IndexPage}
 
             {block:PermalinkPage}
                 <div class="post-background">
-                    <img src="{PhotoURL-HighRes}" alt="{PhotoAlt}"/>
+                    <img src="{PhotoURL-HighRes}" alt="{PhotoAlt}" fetchpriority="high"/>
                 </div>
                 {block:Caption}
                     <div class="caption">{Caption}</div>
@@ -193,13 +207,13 @@
 
                 {Block:IndexPage}
                     <div class="photoset post-background {TagsAsClasses}">
-                        <a href="{Permalink}"><img src="{PhotoURL-500}" width="{PhotoWidth-500}"height="{PhotoHeight-500}" />{block:Caption}{Caption}{/block:Caption}</a>
+                        <a href="{Permalink}"><img src="{PhotoURL-500}" width="{PhotoWidth-500}"height="{PhotoHeight-500}" fetchpriority="high"/>{block:Caption}{Caption}{/block:Caption}</a>
                     </div>
                 {/Block:IndexPage}
 
                 {Block:PermalinkPage}
                     <div class="photoset post-background">
-                        <img src="{PhotoURL-HighRes}" width="{PhotoWidth-HighRes}"height="{PhotoHeight-HighRes}" />
+                        <img src="{PhotoURL-HighRes}" width="{PhotoWidth-HighRes}"height="{PhotoHeight-HighRes}" fetchpriority="high"/>
                     </div>
                 {/Block:PermalinkPage}
 
@@ -416,6 +430,7 @@
         <a href="#" class="load-more"><span class="load-more-entries">+</span></a>
     </footer>
 {/block:IndexPage}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" integrity="sha512-3n19xznO0ubPpSwYCRRBgHh63DrV+bdZfHK52b1esvId4GsfwStQNPJFjeQos2h3JwCmZl0/LgLxSKMAI55hgw==" crossorigin="anonymous"></script>
         <!-- jQuery -->
 <script src="https://static.tumblr.com/j9zrgpw/Pikmg130a/jquery-1.7.1.min.js"></script>
 
@@ -424,8 +439,27 @@
 <script src="https://static.tumblr.com/j9zrgpw/M6qmg12yb/jquery.masonry.min.js"></script>
 <script src="https://static.tumblr.com/wgijwsy/u2vm2hxv6/jquery.infinitescroll.min.js"></script>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/fontawesome.min.css" integrity="sha512-8jdwayz5n8F2cnW26l9vpV6+yGOcRAqz6HTu+DQ3FtVIAts2gTdlFZOGpYhvBMXkWEgxPN3Y22UWyZXuDowNLA==" crossorigin="anonymous" />
 <script>
 (function () {
+
+    function processTextPosts($scope) {
+        $scope.find('.text-body-hidden').each(function() {
+            var $hidden = $(this);
+            var $post = $hidden.closest('.text');
+            var $previewImage = $post.find('.text-preview-image');
+            var $previewTitle = $post.find('.text-preview-title');
+            var $img = $hidden.find('img').first();
+
+            if ($img.length) {
+                var permalink = $previewImage.data('permalink') || '#';
+                $previewImage.append($('<a>').attr('href', permalink).append($img.clone().attr('fetchpriority', 'high')));
+                $previewImage.show();
+            } else {
+                $previewTitle.show();
+            }
+        });
+    }
 
     function resizeVideo(){
         var $video = $('.tumblr_video_container');
@@ -508,6 +542,8 @@
 
             $tumblelog.masonry('appended', $newElems);
 
+            processTextPosts($newElems);
+
             $(".post").hover(function() {
                 $(this).find('img').stop().animate({"opacity": "0.4"}, 300);
             }, function() {
@@ -520,6 +556,8 @@
         $fade.each(function(i) {
             $(this).delay(110*i).fadeIn();
         });
+
+        processTextPosts($tumblelog);
 
         $tumblelog.masonry({
             columnWidth: 300,
