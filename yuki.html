@@ -69,6 +69,10 @@
         .single img {
             height:auto;
         }
+        .text-body-hidden { display: none; }
+        .text-preview-image { display: none; }
+        .text-preview-title { display: none; }
+        .text-preview-image img { width: 100%; height: auto; }
         {CustomCSS}
         </style>
 
@@ -143,17 +147,27 @@
         <!-- Text Post -->
             <div class="text {TagsAsClasses}">
 
-                {Block:PermalinkPage}
+                {block:IndexPage}
+                    <div class="text-body-hidden">{Body}</div>
+                    <div class="text-preview-image post-background" data-permalink="{Permalink}"></div>
+                    <div class="text-preview-title">
+                        {block:Title}
+                            <h2><a href="{Permalink}">{Title}</a></h2>
+                        {/block:Title}
+                    </div>
+                {/block:IndexPage}
+
+                {block:PermalinkPage}
                     <hr>
-                {/Block:PermalinkPage}
 
-                {block:Title}
-                    <h2><a href="{Permalink}">{Title}</a></h2>
-                {/block:Title}
+                    {block:Title}
+                        <h2><a href="{Permalink}">{Title}</a></h2>
+                    {/block:Title}
 
-                <div class="text-body">
-                    {Body}
-                </div>
+                    <div class="text-body">
+                        {Body}
+                    </div>
+                {/block:PermalinkPage}
 
             </div>
         {/block:Text}
@@ -427,6 +441,24 @@
 <script>
 (function () {
 
+    function processTextPosts($scope) {
+        $scope.find('.text-body-hidden').each(function() {
+            var $hidden = $(this);
+            var $post = $hidden.closest('.text');
+            var $previewImage = $post.find('.text-preview-image');
+            var $previewTitle = $post.find('.text-preview-title');
+            var $img = $hidden.find('img').first();
+
+            if ($img.length) {
+                var permalink = $previewImage.data('permalink') || '#';
+                $previewImage.append($('<a>').attr('href', permalink).append($img.clone()));
+                $previewImage.show();
+            } else {
+                $previewTitle.show();
+            }
+        });
+    }
+
     function resizeVideo(){
         var $video = $('.tumblr_video_container');
 
@@ -508,6 +540,8 @@
 
             $tumblelog.masonry('appended', $newElems);
 
+            processTextPosts($newElems);
+
             $(".post").hover(function() {
                 $(this).find('img').stop().animate({"opacity": "0.4"}, 300);
             }, function() {
@@ -520,6 +554,8 @@
         $fade.each(function(i) {
             $(this).delay(110*i).fadeIn();
         });
+
+        processTextPosts($tumblelog);
 
         $tumblelog.masonry({
             columnWidth: 300,
