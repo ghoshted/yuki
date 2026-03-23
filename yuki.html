@@ -80,6 +80,34 @@
 
 <body>
 
+<script>
+// Block iframe with name "unified-controls" from loading
+(function blockUnifiedControls() {
+    var iframes = document.querySelectorAll('iframe[name="unified-controls"]');
+    for (var i = 0; i < iframes.length; i++) {
+        iframes[i].parentNode.removeChild(iframes[i]);
+    }
+    if (typeof MutationObserver !== 'undefined') {
+        var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.nodeName === 'IFRAME' && node.getAttribute('name') === 'unified-controls') {
+                        node.parentNode.removeChild(node);
+                    }
+                    if (node.querySelectorAll) {
+                        var nested = node.querySelectorAll('iframe[name="unified-controls"]');
+                        for (var j = 0; j < nested.length; j++) {
+                            nested[j].parentNode.removeChild(nested[j]);
+                        }
+                    }
+                });
+            });
+        });
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+    }
+})();
+</script>
+
 <div id="container">
 
     <header class="main">
