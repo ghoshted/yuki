@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 
 <!--
-
                                   88         88
                                   88         ""
                                   88
@@ -11,7 +10,7 @@
           `8b,d8'    "8a,   ,a88  88`"Yba,   88
             Y88'      `"YbbdP'Y8  88   `Y8a  88
             d8'
-           d8'     0.2.15
+           d8'     0.2.20 (Modifed)
 
           Yuki by Cory Gibbons
           github.com/corygibbons/yuki
@@ -24,7 +23,7 @@
 
 <html>
     <head>
-        <title>{Title}</title>
+        <title>{Title}{block:IndexPage} - {Description}{/block:IndexPage} {block:PermalinkPage}{block:PostSummary} - {PostSummary}{/block:PostSummary}{/block:PermalinkPage} {block:TagPage} - {Tag}{/block:TagPage}</title>
         <link rel="shortcut icon" href="{Favicon}">
         <link rel="alternate" type="application/rss+xml" href="{RSS}">
 
@@ -32,20 +31,28 @@
           <meta name="description" content="{MetaDescription}" />
         {/block:Description}
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        <!-- jQuery -->
-        <script src="https://static.tumblr.com/j9zrgpw/Pikmg130a/jquery-1.7.1.min.js"></script>
-
-        <!-- Modernizr -->
-        <script src="https://static.tumblr.com/j9zrgpw/3iymg1311/modernizr-1.7.min.js"></script>
+{block:PermalinkPage}	
+<meta property="og:site_name" content="{Title}"/>	
+{block:Posts}	
+<meta property="og:url" content="{Permalink}"/>	
+<meta property="og:title" content="{block:PostSummary}{PlaintextPostSummary}{/block:PostSummary}"/>	
+<meta property="og:description" content="{MetaDescription}"/>	
+{block:Photo}<meta property="og:image" content="{PhotoURL-HighRes}"/>{/block:Photo}	
+<meta property="og:type" content="article"/>	
+{block:Date}<meta property="article:published_time" content="{Year}-{MonthNumberWithZero}-{DayOfMonthWithZero}T{24HourWithZero}:{Minutes}:{Seconds}+00:00" />{/block:Date}	
+{block:HasTags}{block:Tags}<meta property="article:tag" content="{Tag}"/>	
+{/block:Tags}{/block:HasTags}	
+{/block:Posts}	
+{/block:PermalinkPage}
+	    
 
         <!--[if IE]>
             <script src="https://static.tumblr.com/j9zrgpw/Sa4n3cja6/html5.js"></script>
         <![endif]-->
 
         <!-- Stylesheet -->
+        <!-- link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css"/ -->
         <link rel="stylesheet" type="text/css" href="https://static.tumblr.com/j9zrgpw/MFon38qg7/style.css"/>
-        <link rel="stylesheet" type="text/css" href="https://static.tumblr.com/j9zrgpw/ZyFn3civd/font-awesome.css">
 
         <!-- Defaults -->
         <meta name="color:Post Hover" content="#fbfbfb"/>
@@ -58,12 +65,56 @@
         <style type="text/css">
         .post-background { background: {color:Post Hover}; }
         {block:IndexPage} {block:IfNotShowFullPhotoset}.post .photoset { display: none; } .post .photoset:first-child { display: block; }{/block:IfNotShowFullPhotoset}{/block:IndexPage}
+        .single img {
+            height:auto;
+        }
+        .text-body-hidden { visibility: hidden; height: 0; overflow: hidden; position: absolute; }
+        .text-preview-image { display: none; }
+        .text-preview-title { display: none; }
+        .text-preview-image img { width: 100%; height: auto; }
+        .iframe-controls-container { display: none; }
         {CustomCSS}
         </style>
 
     </head>
 
 <body>
+
+<script>
+// Block iframe with name "unified-controls" from loading
+(function blockUnifiedControls() {
+    var iframes = document.querySelectorAll('iframe[name="unified-controls"]');
+    for (var i = 0; i < iframes.length; i++) {
+        if (iframes[i].parentNode) {
+            iframes[i].parentNode.removeChild(iframes[i]);
+        }
+    }
+    if (typeof MutationObserver !== 'undefined') {
+        var observer = new MutationObserver(function(mutations) {
+            for (var m = 0; m < mutations.length; m++) {
+                var addedNodes = mutations[m].addedNodes;
+                for (var n = 0; n < addedNodes.length; n++) {
+                    var node = addedNodes[n];
+                    if (node.nodeName.toUpperCase() === 'IFRAME' && node.getAttribute('name') === 'unified-controls') {
+                        if (node.parentNode) {
+                            node.parentNode.removeChild(node);
+                        }
+                    }
+                    if (node.querySelectorAll) {
+                        var nested = node.querySelectorAll('iframe[name="unified-controls"]');
+                        for (var j = 0; j < nested.length; j++) {
+                            if (nested[j].parentNode) {
+                                nested[j].parentNode.removeChild(nested[j]);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+    }
+})();
+</script>
 
 <div id="container">
 
@@ -74,7 +125,7 @@
             {block:HasPages}
                 /
                 {block:Pages}
-                    <span class="page"><a href="{URL}">{Label}</a></span>
+                    <span class="page"><a href="{URL}">{Label}</a></span> /
                 {/block:Pages}
             {/block:HasPages}
         </div>
@@ -130,19 +181,29 @@
 
         {block:Text}
         <!-- Text Post -->
-            <div class="text">
+            <div class="text {TagsAsClasses}">
 
-                {Block:PermalinkPage}
+                {block:IndexPage}
+                    <div class="text-body-hidden">{Body}</div>
+                    <div class="text-preview-image post-background" data-permalink="{Permalink}"></div>
+                    <div class="text-preview-title">
+                        {block:Title}
+                            <h2><a href="{Permalink}">{Title}</a></h2>
+                        {/block:Title}
+                    </div>
+                {/block:IndexPage}
+
+                {block:PermalinkPage}
                     <hr>
-                {/Block:PermalinkPage}
 
-                {block:Title}
-                    <h2><a href="{Permalink}">{Title}</a></h2>
-                {/block:Title}
+                    {block:Title}
+                        <h2><a href="{Permalink}">{Title}</a></h2>
+                    {/block:Title}
 
-                <div class="text-body">
-                    {Body}
-                </div>
+                    <div class="text-body">
+                        {Body}
+                    </div>
+                {/block:PermalinkPage}
 
             </div>
         {/block:Text}
@@ -155,14 +216,14 @@
         <!-- Photo post -->
 
             {block:IndexPage}
-                <div class="post-background">
-                    <a href="{Permalink}"><img src="{PhotoURL-HighRes}" alt="{PhotoAlt}"/></a>
+                <div class="post-background {TagsAsClasses}">
+                    <a href="{Permalink}"><img src="{PhotoURL-HighRes}" alt="{PhotoAlt}" fetchpriority="high"/></a>
                 </div>
             {/block:IndexPage}
 
             {block:PermalinkPage}
                 <div class="post-background">
-                    <img src="{PhotoURL-HighRes}" alt="{PhotoAlt}"/>
+                    <img src="{PhotoURL-HighRes}" alt="{PhotoAlt}" fetchpriority="high"/>
                 </div>
                 {block:Caption}
                     <div class="caption">{Caption}</div>
@@ -181,24 +242,18 @@
             {block:Photos}
 
                 {Block:IndexPage}
-                    <div class="photoset post-background">
-                        <a href="{Permalink}"><img src="{PhotoURL-500}" width="{PhotoWidth-500}"height="{PhotoHeight-500}" /></a>
+                    <div class="photoset post-background {TagsAsClasses}">
+                        <a href="{Permalink}"><img src="{PhotoURL-500}" width="{PhotoWidth-500}"height="{PhotoHeight-500}" fetchpriority="high"/>{block:Caption}{Caption}{/block:Caption}</a>
                     </div>
                 {/Block:IndexPage}
 
                 {Block:PermalinkPage}
                     <div class="photoset post-background">
-                        <img src="{PhotoURL-HighRes}" width="{PhotoWidth-HighRes}"height="{PhotoHeight-HighRes}" />
+                        <img src="{PhotoURL-HighRes}" width="{PhotoWidth-HighRes}"height="{PhotoHeight-HighRes}" fetchpriority="high"/>
                     </div>
                 {/Block:PermalinkPage}
 
             {/block:Photos}
-
-            {Block:PermalinkPage}
-                {block:Caption}
-                    <div class="caption">{Caption}</div>
-                {/block:Caption}
-            {/Block:PermalinkPage}
 
         {/block:Photoset}
 
@@ -210,7 +265,7 @@
         <!-- Video post -->
 
             {Block:IndexPage}
-                <div class="video post-background">
+                <div class="video post-background {TagsAsClasses}">
                     {block:VideoThumbnail}
                         <a href="{Permalink}">
                             <img src="{VideoThumbnailURL}" />
@@ -236,7 +291,7 @@
 
         {block:Audio}
         <!-- Audio post -->
-            <div class="audio">
+            <div class="audio {TagsAsClasses}">
 
                 {Block:IndexPage}
                     {block:AudioEmbed}
@@ -254,7 +309,7 @@
         {block:Quote}
         <!-- Quote post -->
 
-            <div class="quote">
+            <div class="quote {TagsAsClasses}">
                 "{Quote}"
 
                 {block:Source}
@@ -271,7 +326,7 @@
         {block:Chat}
         <!-- Chat post -->
 
-            <div class="chat">
+            <div class="chat {TagsAsClasses}">
 
                 {block:Title}
                     <h3><a href="{Permalink}">{Title}</a></h3>
@@ -301,12 +356,15 @@
         {block:Link}
         <!-- Link post -->
 
-            <div class="link">
+            <div class="link pa2 {block:Tags}{Tag} {/block:Tags}">
                 <a href="{URL}" class="link-title" {Target}>{Name} <i class="fa fa-external-link fa-fw"></i></a>
 
                 {block:Description}
-                    <div class="description">{Description}</div>
-                {/block:Description}
+                    <div class="description">
+                    {block:Thumbnail}
+                    <img src="{Thumbnail}" style="width:4rem; float:left" class="ma3"/>
+                    {/block:Thumbnail}{Description}</div>
+                {/block:Description} <a href="{Permalink}"> ➜ </a>
             </div>
 
         {/block:Link}
@@ -320,6 +378,13 @@
 
             {block:Date}
                 <section class="post fade single navigation">
+                {block:Photoset}  
+                          
+                {block:Caption}
+                    <div class="caption">{Caption}</div>
+                {/block:Caption}
+
+        {/block:Photoset} 
                     <header>Posted</header>
                     {Month} {DayOfMonth}, {Year}
                 </section>
@@ -401,15 +466,36 @@
         <a href="#" class="load-more"><span class="load-more-entries">+</span></a>
     </footer>
 {/block:IndexPage}
-
+<script src="https://static.tumblr.com/ef7nr2u/aRWtcdfqf/modernizr.min.js"></script>
+	<!-- jQuery -->
+<script src="https://static.tumblr.com/j9zrgpw/Pikmg130a/jquery-1.7.1.min.js"></script>
 
 <script src="https://static.tumblr.com/iwtk77u/Yhym2yygt/jquery.imagesloaded.min.js"></script>
 <!-- jQuery Masonry -->
 <script src="https://static.tumblr.com/j9zrgpw/M6qmg12yb/jquery.masonry.min.js"></script>
 <script src="https://static.tumblr.com/wgijwsy/u2vm2hxv6/jquery.infinitescroll.min.js"></script>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/fontawesome.min.css" integrity="sha512-8jdwayz5n8F2cnW26l9vpV6+yGOcRAqz6HTu+DQ3FtVIAts2gTdlFZOGpYhvBMXkWEgxPN3Y22UWyZXuDowNLA==" crossorigin="anonymous" />
 <script>
 (function () {
+
+    function processTextPosts($scope) {
+        $scope.find('.text-body-hidden').each(function() {
+            var $hidden = $(this);
+            var $post = $hidden.closest('.text');
+            var $previewImage = $post.find('.text-preview-image');
+            var $previewTitle = $post.find('.text-preview-title');
+            var $img = $hidden.find('img').first();
+
+            if ($img.length) {
+                var permalink = $previewImage.data('permalink') || '#';
+                $previewImage.append($('<a>').attr('href', permalink).append($img.clone().attr('fetchpriority', 'high')));
+                $previewImage.show();
+            } else {
+                $previewTitle.show();
+            }
+        });
+    }
 
     function resizeVideo(){
         var $video = $('.tumblr_video_container');
@@ -492,6 +578,8 @@
 
             $tumblelog.masonry('appended', $newElems);
 
+            processTextPosts($newElems);
+
             $(".post").hover(function() {
                 $(this).find('img').stop().animate({"opacity": "0.4"}, 300);
             }, function() {
@@ -504,6 +592,8 @@
         $fade.each(function(i) {
             $(this).delay(110*i).fadeIn();
         });
+
+        processTextPosts($tumblelog);
 
         $tumblelog.masonry({
             columnWidth: 300,
