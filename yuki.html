@@ -73,6 +73,92 @@
         .text-preview-title { display: none; }
         .text-preview-image img { width: 100%; height: auto; }
         .iframe-controls-container { display: none; }
+        ul {
+            padding-left:0;
+        }
+        li {
+            
+            list-style-type: square;
+            line-height: 2rem;
+        }
+        ol li {
+            padding-left: 1rem;
+            line-height: 2rem;
+            list-style: decimal-leading-zero;
+        }
+        .text .text-body a {
+            color: #3282B8;
+            line-break: anywhere;
+            text-decoration: none;
+        }
+        
+        p.npf_chat {
+            padding: 1rem;
+            border-left: 1px solid #666666;
+            border-right: 1px solid #666666;
+            font-family: inherit;
+        }
+        div.npf-link-block {
+            padding: 2rem
+        }
+        div.npf-link-block .poster {
+            width: 30%;
+            float: left;
+            margin-right: 2rem;
+        }
+        div.npf-link-block .poster .title {
+            display:none;
+        }
+        body {
+            font-size: 16px;
+            color: #0F4C75;
+            font-family: "Sorts Mill Goudy", serif;
+            letter-spacing: 0.1rem;
+        }
+        a {
+            color: #1B262C;
+        }
+        .post header {
+            color: #3282B8;
+        }
+        .page a {
+            color: #3282B8;
+        }
+        .post-content div.npf_row, .post div.npf_row, body div.npf_row
+        {
+            margin-top: 10rem;
+            clear: both;
+            margin-bottom: 2rem;
+        }
+        .text-body div.npf_row:first-child {
+            margin-top:0;
+        }
+        .npf_indented {
+            font-size: 16px;
+            font-weight: normal;
+            padding-left: 2rem;
+            border-left: 1px solid rgb(230, 230, 230);
+            max-width: 300px;
+            display: block;
+            float: right;
+            clear: both;
+        }
+        .npf-link-block a {
+            text-decoration: none !important;
+        }
+        div.npf-link-block .title {
+            font-size: 16px !important;
+            font-weight: bold;
+        }
+        div.npf-link-block {
+            border: none;
+            border-bottom:  0.5px solid black;
+            border-radius: 0;
+        }
+        .text h2 {
+            font-weight: normal;
+        }
+        
         {CustomCSS}
         </style>
 
@@ -85,31 +171,23 @@
 (function blockUnifiedControls() {
     var iframes = document.querySelectorAll('iframe[name="unified-controls"]');
     for (var i = 0; i < iframes.length; i++) {
-        if (iframes[i].parentNode) {
-            iframes[i].parentNode.removeChild(iframes[i]);
-        }
+        iframes[i].parentNode.removeChild(iframes[i]);
     }
     if (typeof MutationObserver !== 'undefined') {
         var observer = new MutationObserver(function(mutations) {
-            for (var m = 0; m < mutations.length; m++) {
-                var addedNodes = mutations[m].addedNodes;
-                for (var n = 0; n < addedNodes.length; n++) {
-                    var node = addedNodes[n];
-                    if (node.nodeName.toUpperCase() === 'IFRAME' && node.getAttribute('name') === 'unified-controls') {
-                        if (node.parentNode) {
-                            node.parentNode.removeChild(node);
-                        }
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.nodeName === 'IFRAME' && node.getAttribute('name') === 'unified-controls') {
+                        node.parentNode.removeChild(node);
                     }
                     if (node.querySelectorAll) {
                         var nested = node.querySelectorAll('iframe[name="unified-controls"]');
                         for (var j = 0; j < nested.length; j++) {
-                            if (nested[j].parentNode) {
-                                nested[j].parentNode.removeChild(nested[j]);
-                            }
+                            nested[j].parentNode.removeChild(nested[j]);
                         }
                     }
-                }
-            }
+                });
+            });
         });
         observer.observe(document.documentElement, { childList: true, subtree: true });
     }
@@ -150,11 +228,11 @@
 
         {block:Post1}
             {block:IndexPage}
-                <section class="post fade double">
+                <section class="post fade double index">
             {/block:IndexPage}
 
             {block:PermalinkPage}
-                <section class="post fade double">
+                <section class="post fade double permalink {TagsAsClasses}">
             {/block:PermalinkPage}
         {/block:Post1}
 
@@ -186,15 +264,20 @@
                 {block:IndexPage}
                     <div class="text-body-hidden">{Body}</div>
                     <div class="text-preview-image post-background" data-permalink="{Permalink}"></div>
+                    
+                    {block:Title}
+                           <div class="post-title"> <p> <a href="{Permalink}">{Title}</a></p></div>
+                    {/block:Title}
                     <div class="text-preview-title">
-                        {block:Title}
-                            <h2><a href="{Permalink}">{Title}</a></h2>
-                        {/block:Title}
+                         <div class="text-body">
+                        {Body}
+                        </div>
                     </div>
+                    
                 {/block:IndexPage}
 
                 {block:PermalinkPage}
-                    <hr>
+                    <!-- hr -->
 
                     {block:Title}
                         <h2><a href="{Permalink}">{Title}</a></h2>
